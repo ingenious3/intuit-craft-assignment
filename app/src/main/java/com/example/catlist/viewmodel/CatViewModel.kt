@@ -18,19 +18,24 @@ class CatViewModel @Inject constructor(private val appRepository: AppRepository)
     private var _errorGetData = MutableLiveData<String>()
     var errorGetData: LiveData<String> = _errorGetData
 
+    var pageNumber: Int = 0
+
     fun getData() {
 
         viewModelScope.launch {
             try {
-                when (val response = appRepository.getCatList(10,0, "DESC")) {
+                when (val response = appRepository.getCatList(10, pageNumber, "DESC")) {
                     is ResultData.Success -> {
+                        pageNumber++
                         _listResult.postValue(response.data)
                     }
                     is ResultData.Error -> {
+                        pageNumber = -1
                         _errorGetData.postValue(response.exception.toString())
                     }
                 }
             } catch (e: Exception) {
+                pageNumber = -1
                 _errorGetData.postValue(e.message)
             }
         }

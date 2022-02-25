@@ -51,9 +51,15 @@ class CatListActivity : AppCompatActivity() {
             setDrawable(AppCompatResources.getDrawable(this@CatListActivity, R.drawable.divider)!!)
         }
         rv_catlist.addItemDecoration(dividerItemDecoration)
-        adapter.setOnItemClickListener(object : CatListItemAdapter.OnItemClickListener {
+        adapter.setOnItemClickListener(object : CatListItemAdapter.AdapterListener {
             override fun onItemClick(catListItem: CatListItem) {
                 Log.e("TAG-51", catListItem.toString())
+            }
+
+            override fun onLoadMore() {
+                if (viewModel.pageNumber >= 0) {
+                    getListData()
+                }
             }
         })
         rv_catlist.adapter = adapter
@@ -74,8 +80,12 @@ class CatListActivity : AppCompatActivity() {
         })
 
         viewModel.errorGetData.observe(this, Observer {
-            pb_loading.visibility = View.GONE
-            tv_error.visibility = View.VISIBLE
+            if (viewModel.listResult?.value?.isEmpty() ?: true) {
+                pb_loading.visibility = View.GONE
+                tv_error.visibility = View.VISIBLE
+            } else {
+                pb_loading.visibility = View.GONE
+            }
         })
 
     }

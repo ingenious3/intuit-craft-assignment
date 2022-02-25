@@ -3,7 +3,6 @@ package com.example.catlist.ui.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -14,14 +13,15 @@ import kotlinx.android.synthetic.main.cat_list_item.view.*
 class CatListItemAdapter : RecyclerView.Adapter<CatListItemViewHolder>() {
 
     private var items : ArrayList<CatListItem> = ArrayList<CatListItem>()
-    var itemClickListener: OnItemClickListener? = null
+    var adapterListener : AdapterListener? = null
 
-    interface OnItemClickListener {
+    interface AdapterListener {
         fun onItemClick(catListItem: CatListItem)
+        fun onLoadMore()
     }
 
-    public fun setOnItemClickListener(itemClickListener: OnItemClickListener) {
-        this.itemClickListener = itemClickListener
+    public fun setOnItemClickListener(itemClickListener: AdapterListener) {
+        this.adapterListener = itemClickListener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CatListItemViewHolder {
@@ -34,9 +34,13 @@ class CatListItemAdapter : RecyclerView.Adapter<CatListItemViewHolder>() {
             val breedName = item.originalFilename?.split(".")?.get(0)?.replace("-"," ")?.replace("_", " ")
             tv_breed.text = breedName
             setOnClickListener {
-                itemClickListener?.onItemClick(item)
+                adapterListener?.onItemClick(item)
             }
             Glide.with(context).load(item.url).centerCrop().into(img_cat)
+
+            if (position == (items.size -1)) {
+                adapterListener?.onLoadMore()
+            }
         }
     }
 
